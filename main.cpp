@@ -6,15 +6,15 @@
 using namespace std;
 
 int print_syntax();
-
 int soft2hard();
-string a2n();
 
 int soft2hard()
 {
+    // Optimize I/O performance
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
 
     string buffer;
-    
 
     while (getline(cin, buffer))
     {
@@ -22,36 +22,32 @@ int soft2hard()
             continue;
         if (buffer[0] == '>')
         {
-            cout << buffer << endl;
+            cout << buffer << '\n';
         }
-
         else
         {
+            // Single-pass transformation: replace lowercase nucleotides with 'N'
+            std::transform(buffer.begin(), buffer.end(), buffer.begin(),
+                [](char c) {
+                    return (c == 'a' || c == 't' || c == 'c' || c == 'g') ? 'N' : c;
+                });
 
-#pragma omp parallel
-            {
-                std::replace(buffer.begin(), buffer.end(), 'a', 'N');
-            }
-#pragma omp parallel
-            {
-                std::replace(buffer.begin(), buffer.end(), 't', 'N');
-            }
-#pragma omp parallel
-            {
-                std::replace(buffer.begin(), buffer.end(), 'c', 'N');
-            }
-#pragma omp parallel
-            {
-                std::replace(buffer.begin(), buffer.end(), 'g', 'N');
-            }
-
-         
-
-#pragma omp barrier
-            cout << buffer << endl;
-            
+            cout << buffer << '\n';
         }
 
+        // Check for output errors
+        if (cout.fail())
+        {
+            cerr << "Error: Failed to write to stdout" << endl;
+            return 1;
+        }
+    }
+
+    // Check for input errors
+    if (cin.bad())
+    {
+        cerr << "Error: Failed to read from stdin" << endl;
+        return 1;
     }
 
     return 0;
